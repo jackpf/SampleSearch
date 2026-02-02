@@ -4,10 +4,14 @@ import sys
 
 from sample_search.cmd.index_cmd import IndexCmd
 
+commands = {
+    IndexCmd.name(): IndexCmd,
+}
 
 def process_command(cmd: str) -> str:
-    if cmd == IndexCmd.name():
-        return IndexCmd().run()
+    instance = commands.get(cmd)
+    if instance:
+        return instance().run()
     else:
         raise Exception(f"Unknown command: {cmd}")
 
