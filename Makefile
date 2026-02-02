@@ -24,3 +24,7 @@ lint:
 install:
 	pip install -r requirements.txt
 
+.PHONY: run
+run:
+	PYTHONPATH=src python -m sample_search.main
+
