@@ -19,8 +19,9 @@ message Response {
 }
 
 message IndexRequest {
-  string filename = 1;
+  string path = 1;
 }
 
 message IndexResponse {
+  repeated string paths_indexed = 1;
 }

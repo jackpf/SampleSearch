@@ -2,6 +2,7 @@ import torch
 import librosa
 from transformers import ClapModel, ClapProcessor
 import sys
+import torch.nn.functional as f
 
 # 1. Load the model (Only happens once)
 print("--- Loading CLAP Model... (This takes a moment) ---")
@@ -23,15 +24,16 @@ def get_audio_embedding(file_path):
         # audio_data = audio_data[:48000*10]
 
         # Process audio inputs
-        inputs = processor(audios=audio_data, return_tensors="pt", sampling_rate=48000)
+        inputs = processor(audio=audio_data, return_tensors="pt", sampling_rate=48000)
 
         # Get the embedding (run only the audio branch of the model)
         with torch.no_grad():
             audio_embed = model.get_audio_features(**inputs)
+            print(audio_embed.pooler_output.size())
 
         # Normalize immediately for Cosine Similarity
         # (Vector / Magnitude = Unit Vector)
-        audio_embed = audio_embed / audio_embed.norm(dim=-1, keepdim=True)
+        audio_embed = f.normalize(audio_embed.pooler_output, p=2, dim=-1)
         return audio_embed
 
     except FileNotFoundError:
@@ -46,9 +48,10 @@ def get_text_embedding(text_query):
     inputs = processor(text=[text_query], return_tensors="pt")
     with torch.no_grad():
         text_embed = model.get_text_features(**inputs)
+        print(text_embed.pooler_output.size())
 
     # Normalize
-    text_embed = text_embed / text_embed.norm(dim=-1, keepdim=True)
+    text_embed = f.normalize(text_embed.pooler_output, p=2, dim=-1)
     return text_embed
 
 # --- MAIN LOOP ---

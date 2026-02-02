@@ -9,7 +9,6 @@ class Cmd(ABC, Generic[Request, Response]):
     def __init__(self) -> None:
         pass
 
-
     @staticmethod
     @abstractmethod
     def name() -> str: ...

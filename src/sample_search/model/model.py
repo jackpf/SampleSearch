@@ -1,5 +1,6 @@
 import librosa
 import torch
+import torch.nn.functional as f
 from transformers import ClapModel, ClapProcessor
 
 
@@ -13,16 +14,14 @@ class Model:
         self.model = ClapModel.from_pretrained(model_name)
         self.processor = ClapProcessor.from_pretrained(model_name)
 
-    def audio_embedding(self, file_path: str) -> torch.Tensor:
+    def audio_embedding(self, file_path: str) -> list[float]:
         audio_data, _ = librosa.load(file_path, sr=self.SAMPLE_RATE)
         inputs = self.processor(
-            audios=audio_data, return_tensors="pt", sampling_rate=self.SAMPLE_RATE
+            audio=audio_data, return_tensors="pt", sampling_rate=self.SAMPLE_RATE
         )
 
         with torch.no_grad():
             audio_embedding = self.model.get_audio_features(**inputs)
-        tensor: torch.Tensor = audio_embedding / audio_embedding.norm(
-            dim=-1, keepdim=True
-        )
+        tensor = f.normalize(audio_embedding.pooler_output, p=2, dim=-1)
 
-        return tensor
+        return tensor[0].detach().cpu().tolist()
