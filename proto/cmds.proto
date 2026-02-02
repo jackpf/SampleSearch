@@ -1,0 +1,26 @@
+syntax = "proto3";
+package sample_search;
+
+message Request {
+  reserved 1 to 99;
+  oneof payload {
+    IndexRequest index = 100;
+  }
+}
+
+message Response {
+  bool success = 1;
+  optional string error_message = 2;
+
+  reserved 3 to 99;
+  oneof payload {
+    IndexResponse index = 100;
+  }
+}
+
+message IndexRequest {
+  string filename = 1;
+}
+
+message IndexResponse {
+}
