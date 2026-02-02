@@ -82,4 +82,4 @@ ehthumbs.db
 Desktop.ini
 
 # Protos
-./src/gen
+src/gen
