@@ -1,4 +1,4 @@
-from cmd import Cmd
+from .cmd import Cmd
 
 
 class IndexCmd(Cmd):

@@ -20,3 +20,7 @@ lint:
 	ruff check src
 	mypy src
 
+.PHONY: install
+install:
+	pip install -r requirements.txt
+

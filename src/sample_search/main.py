@@ -18,4 +18,4 @@ if __name__ == "__main__":
 
     for cmd in sys.stdin:
         response = process_command(cmd)
-    print(json.dumps(response), flush=True)
+        print(json.dumps(response), flush=True)
