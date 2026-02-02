@@ -16,8 +16,8 @@ warn_unused_configs = true
 module = [
     "torch.*",
     "transformers.*",
-    "onnx.*",
-    "onnxscript.*",
+    "librosa.*",
+    "gen.*",
 ]
 ignore_missing_imports = true
 

@@ -1,25 +1,40 @@
-import argparse
-import json
 import sys
 
-from sample_search.cmd.index_cmd import IndexCmd
+from google.protobuf.json_format import MessageToJson, Parse
+
+from gen.cmds_pb2 import Request, Response
+
+from .cmd.index_cmd import IndexCmd
 
 commands = {
     IndexCmd.name(): IndexCmd,
 }
 
-def process_command(cmd: str) -> str:
+
+def process_command(request: Request) -> Response:
+    cmd = request.WhichOneof("payload")
     instance = commands.get(cmd)
     if instance:
-        return instance().run()
+        result = instance().run(request.index)
+        return Response(success=True, index=result)
     else:
-        raise Exception(f"Unknown command: {cmd}")
+        return Response(success=False, error_message=f"Unknown command: {cmd}")
+
+
+def main() -> None:
+    for line in sys.stdin:
+        line = line.strip()
+        if not line:
+            continue
+
+        try:
+            request = Parse(line, Request())
+            response = process_command(request)
+        except Exception as e:
+            response = Response(success=False, error_message=str(e))
+
+        print(MessageToJson(response), flush=True)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Sample search")
-    parser.add_argument("--db", type=str, required=True, help="Database file")
-
-    for cmd in sys.stdin:
-        response = process_command(cmd)
-        print(json.dumps(response), flush=True)
+    main()
