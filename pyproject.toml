@@ -17,9 +17,15 @@ module = [
     "torch.*",
     "transformers.*",
     "librosa.*",
-    "gen.*",
+    "sqlite_vec",
+    "sqlite_vec.*",
 ]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["gen.*"]
+ignore_missing_imports = true
+ignore_errors = true
 
 [tool.ruff]
 line-length = 88
@@ -27,3 +33,4 @@ exclude = ["src/gen"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP"]
+ignore = ["E501"]

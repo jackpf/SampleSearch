@@ -62,8 +62,8 @@ class SamplesRepository(VectorRepository):
                 file_hash,
                 distance
                 {fetch_embedding_q}
-            FROM samples 
-            WHERE embedding MATCH ? 
+            FROM samples
+            WHERE embedding MATCH ?
             AND k = ?
             ORDER BY distance
         """,
