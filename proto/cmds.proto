@@ -5,6 +5,7 @@ message Request {
   reserved 1 to 99;
   oneof payload {
     IndexRequest index = 100;
+    SearchRequest search = 101;
   }
 }
 
@@ -15,6 +16,7 @@ message Response {
   reserved 3 to 99;
   oneof payload {
     IndexResponse index = 100;
+    SearchResponse search = 101;
   }
 }
 
@@ -24,4 +26,17 @@ message IndexRequest {
 
 message IndexResponse {
   repeated string paths_indexed = 1;
+}
+
+message SearchRequest {
+  string query = 1;
+}
+
+message SearchResult {
+  string path = 1;
+  float score = 2;
+}
+
+message SearchResponse {
+  repeated SearchResult results = 1;
 }

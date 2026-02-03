@@ -1,3 +1,4 @@
+import math
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -11,6 +12,11 @@ class SampleInfo:
     mtime: float | None
     file_hash: str
     vector: list[float] | None
+
+@dataclass
+class SampleInfoResult:
+    sample_info: SampleInfo
+    score: float
 
 
 class SamplesRepository(VectorRepository):
@@ -44,19 +50,19 @@ class SamplesRepository(VectorRepository):
             )
 
         self._db.executemany(
-            "INSERT OR REPLACE INTO samples(rowid, path, mtime, file_hash, embedding) VALUES (?, ?, ?, ?, ?)",
+            "INSERT OR REPLACE INTO samples(id, path, mtime, file_hash, embedding) VALUES (?, ?, ?, ?, ?)",
             upsert,
         )
         self._db.commit()
 
     def search(
         self, query_vector: list[float], k: int = 5, fetch_embedding: bool = False
-    ) -> list[SampleInfo]:
+    ) -> list[SampleInfoResult]:
         fetch_embedding_q = ",embedding" if fetch_embedding else ""
         results = self._db.execute(
             f"""
             SELECT
-                rowid,
+                id,
                 path,
                 mtime,
                 file_hash,
@@ -72,15 +78,16 @@ class SamplesRepository(VectorRepository):
 
         samples = []
         for result in results:
+            score = 1 - (math.pow(result["distance"], 2) / 2)
             samples.append(
-                SampleInfo(
-                    id=result["rowid"],
-                    path=Path(result["path"]),
-                    mtime=result["mtime"],
-                    file_hash=result["file_hash"],
-                    vector=self._deserialize_f32(result["embedding"])
-                    if fetch_embedding
-                    else None,
+                SampleInfoResult(
+                    sample_info=SampleInfo(id=result["id"],
+                        path=Path(result["path"]),
+                        mtime=result["mtime"],
+                        file_hash=result["file_hash"],
+                        vector=self._deserialize_f32(result["embedding"]) if fetch_embedding else None,
+                   ),
+                    score=score,
                 )
             )
 

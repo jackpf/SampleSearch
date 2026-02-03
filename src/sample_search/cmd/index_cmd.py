@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from gen.cmds_pb2 import IndexRequest, IndexResponse
+from gen.cmds_pb2 import IndexRequest, IndexResponse, Request, Response
 
 from ..model.model import Model
 from ..repository.samples_repository import SampleInfo, SamplesRepository
@@ -21,6 +21,12 @@ class IndexCmd(Cmd[IndexRequest, IndexResponse]):
     @staticmethod
     def name() -> str:
         return "index"
+
+    def extract_request(self, request: Request) -> IndexRequest:
+        return request.index
+
+    def pack_response(self, response: IndexResponse) -> Response:
+        return Response(success=True, index=response)
 
     def _expand_path(self, path: Path) -> list[Path]:
         if path.is_dir():
