@@ -1,0 +1,42 @@
+syntax = "proto3";
+package sample_search;
+
+message Request {
+  reserved 1 to 99;
+  oneof payload {
+    IndexRequest index = 100;
+    SearchRequest search = 101;
+  }
+}
+
+message Response {
+  bool success = 1;
+  optional string error_message = 2;
+
+  reserved 3 to 99;
+  oneof payload {
+    IndexResponse index = 100;
+    SearchResponse search = 101;
+  }
+}
+
+message IndexRequest {
+  string path = 1;
+}
+
+message IndexResponse {
+  repeated string paths_indexed = 1;
+}
+
+message SearchRequest {
+  string query = 1;
+}
+
+message SearchResult {
+  string path = 1;
+  float score = 2;
+}
+
+message SearchResponse {
+  repeated SearchResult results = 1;
+}
