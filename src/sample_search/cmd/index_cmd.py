@@ -1,10 +1,9 @@
 from pathlib import Path
 
 from gen.cmds_pb2 import IndexRequest, IndexResponse, Request, Response
-
+from .cmd import Cmd
 from ..model.model import Model
 from ..repository.samples_repository import SampleInfo, SamplesRepository
-from .cmd import Cmd
 
 
 class IndexCmd(Cmd[IndexRequest, IndexResponse]):
@@ -35,8 +34,10 @@ class IndexCmd(Cmd[IndexRequest, IndexResponse]):
                 for p in path.rglob("*")
                 if p.is_file() and p.suffix in self._supported_file_types
             ]
-        else:
+        elif path.is_file() and path.suffix in self._supported_file_types:
             return [path.resolve()]
+        else:
+            return []
 
     def run(self, request: IndexRequest) -> IndexResponse:
         files = self._expand_path(Path(request.path))
@@ -44,19 +45,18 @@ class IndexCmd(Cmd[IndexRequest, IndexResponse]):
         samples = []
         inserted = []
         for file in files:
-            audio_embedding = self._model.audio_embedding(request.path)
+            audio_embedding = self._model.audio_embedding(file)
             mtime = 0.0  # TODO
             file_hash = ""  # TODO
 
-            samples.append(
-                SampleInfo(
-                    id=None,
-                    path=file,
-                    mtime=mtime,
-                    file_hash=file_hash,
-                    vector=audio_embedding,
-                )
+            sample = SampleInfo(
+                id=None,
+                path=file,
+                mtime=mtime,
+                file_hash=file_hash,
+                vector=audio_embedding,
             )
+            samples.append(sample)
             inserted.append(str(file))
 
         self._sample_repo.upsert(samples)

@@ -1,4 +1,5 @@
 import json
+import logging
 import sys
 import traceback
 from pathlib import Path
@@ -31,6 +32,10 @@ def process_command(request: Request) -> Response:
 
 
 def main() -> None:
+    # TODO Configurable via --verbose
+    logging.basicConfig()
+    logging.getLogger().setLevel(logging.FATAL)
+
     for line in sys.stdin:
         line = line.strip()
         if not line:
@@ -40,9 +45,7 @@ def main() -> None:
             request = Parse(line, Request())
             response = process_command(request)
         except Exception as e:
-            # TODO Only if --verbose
-            full_trace = traceback.format_exc()
-            print(full_trace)
+            logging.error(traceback.format_exc())
             response = Response(success=False, error_message=str(e))
 
         print(json.dumps(MessageToDict(response)), flush=True)

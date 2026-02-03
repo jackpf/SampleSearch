@@ -56,7 +56,7 @@ class SamplesRepository(VectorRepository):
         self._db.commit()
 
     def search(
-        self, query_vector: list[float], k: int = 5, fetch_embedding: bool = False
+        self, query_vector: list[float], k: int = 20, fetch_embedding: bool = False
     ) -> list[SampleInfoResult]:
         fetch_embedding_q = ",embedding" if fetch_embedding else ""
         results = self._db.execute(

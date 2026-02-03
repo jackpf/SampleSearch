@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import librosa
 import torch
 import torch.nn.functional as f
@@ -14,7 +16,7 @@ class Model:
         self._model = ClapModel.from_pretrained(model_name)
         self._processor = ClapProcessor.from_pretrained(model_name)
 
-    def audio_embedding(self, file_path: str) -> list[float]:
+    def audio_embedding(self, file_path: Path) -> list[float]:
         audio_data, _ = librosa.load(file_path, sr=self.SAMPLE_RATE)
         inputs = self._processor(
             audio=audio_data, return_tensors="pt", sampling_rate=self.SAMPLE_RATE
